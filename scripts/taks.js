@@ -1,13 +1,18 @@
 // SEGURIDAD: Si no se encuentra en localStorage info del usuario
 // no lo deja acceder a la página, redirigiendo al login inmediatamente.
+const jwt = localStorage.getItem('jwt');
+if (jwt){
 
+}else{
+  location.replace('index.html');
+}
 
 
 /* ------ comienzan las funcionalidades una vez que carga el documento ------ */
 window.addEventListener('load', function () {
 
   /* ---------------- variables globales y llamado a funciones ---------------- */
-  
+  const btnCerrarSesion = document.querySelector('#closeApp');
 
 
   /* -------------------------------------------------------------------------- */
@@ -15,10 +20,10 @@ window.addEventListener('load', function () {
   /* -------------------------------------------------------------------------- */
 
   btnCerrarSesion.addEventListener('click', function () {
-   
-
-
-
+    if( confirm('Deseas cerrar sesión? ') ){
+      localStorage.removeItem('jwt');
+      location.replace('index.html');
+    }
   });
 
   /* -------------------------------------------------------------------------- */
