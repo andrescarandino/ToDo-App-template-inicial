@@ -10,7 +10,7 @@ if (jwt){
 
 /* ------ comienzan las funcionalidades una vez que carga el documento ------ */
 window.addEventListener('load', function () {
-
+  obtenerNombreUsuario();
   /* ---------------- variables globales y llamado a funciones ---------------- */
   const btnCerrarSesion = document.querySelector('#closeApp');
 
@@ -31,10 +31,24 @@ window.addEventListener('load', function () {
   /* -------------------------------------------------------------------------- */
 
   function obtenerNombreUsuario() {
-   
+    const nombreUsuario = document.querySelector('.user-info p');
+    
 
+    const endpoint = 'https://todo-api.ctd.academy/v1/users/getMe';
+    const config = {
+      method: 'GET',
+      headers: {
+        authorization: jwt,
+      }
+      }    
 
+      fetch(endpoint, config)
+      .then(response => response.json())
+      .then(datos => {
+        nombreUsuario.innerText = datos.firstName + " " +datos.lastName;
 
+      })
+      .catch(error => error);
   };
 
 
