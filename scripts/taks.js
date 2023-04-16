@@ -21,16 +21,32 @@ window.addEventListener('load', function () {
 
   obtenerNombreUsuario();
   consultarTareas();
+  
 
   /* -------------------------------------------------------------------------- */
   /*                          FUNCIÓN 1 - Cerrar sesión                         */
   /* -------------------------------------------------------------------------- */
 
   btnCerrarSesion.addEventListener('click', function () {
-    if( confirm('Deseas cerrar sesión? ') ){
-      localStorage.removeItem('jwt');
-      location.replace('index.html');
-    }
+    Swal.fire({
+      title: 'ToDo App',
+      text: "¿Seguro que desea Salir de la APP?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si',
+      cancelButtonText: 'Cancelar',
+      background: '#000',
+      color: '#fff',
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+        localStorage.removeItem('jwt');
+        location.replace('index.html');
+      }
+    })
+
   });
 
   /* -------------------------------------------------------------------------- */
@@ -76,9 +92,7 @@ window.addEventListener('load', function () {
       fetch(endpoint, config)
       .then(response => response.json())
       .then(datos => {
-        console.log(datos);
         renderizarTareas(datos);
-        
       })
       .catch(error => error);
   }
@@ -141,7 +155,10 @@ window.addEventListener('load', function () {
         }
         cantidadTareasFinalizadas.innerText = tareasCompletadas;
       });
-  
+      
+
+      botonesCambioEstado();
+      botonBorrarTarea();
   };
 
 
@@ -150,10 +167,34 @@ window.addEventListener('load', function () {
   /*                  FUNCIÓN 6 - Cambiar estado de tarea [PUT]                 */
   /* -------------------------------------------------------------------------- */
   function botonesCambioEstado() {
-    
-    
+    const btnCambioEstado = document.querySelectorAll('.change');
 
+    btnCambioEstado.forEach( boton => {
+      boton.addEventListener('click', function(e){
+        const terminada = e.target.classList.contains('incompleta');
+        const id = e.target.id;
+        const endpoint = 'https://todo-api.ctd.academy/v1/tasks/'+id;
 
+        const datos = {
+          completed: !terminada
+        }
+
+        const config = {
+          method: 'PUT',
+          body:  JSON.stringify( datos),
+          headers: {
+            authorization: jwt,
+            'Content-type': 'application/json; charset=UTF-8'
+          }
+        }
+      
+        fetch(endpoint, config)
+        .then( response => response.json())
+        .then( json => {
+          consultarTareas();
+        })
+      })
+    })
 
   }
 
@@ -162,12 +203,32 @@ window.addEventListener('load', function () {
   /*                     FUNCIÓN 7 - Eliminar tarea [DELETE]                    */
   /* -------------------------------------------------------------------------- */
   function botonBorrarTarea() {
-   
     
-
+    const btnBorrarTarea = document.querySelectorAll('.borrar');
     
+    btnBorrarTarea.forEach( tarea => {
 
-  };
+      tarea.addEventListener('click', function(e){
+        const id = e.target.id;
+        const endpoint = 'https://todo-api.ctd.academy/v1/tasks/'+id;
+
+        const config = {
+          method: 'DELETE',
+          headers: {
+            authorization: jwt,
+            'Content-type': 'application/json; charset=UTF-8'
+          }
+        }
+      
+        fetch(endpoint, config)
+        .then( response => response.json())
+        .then( json => {
+          consultarTareas();
+        })
+      })
+    })
+  }
+
 
     /* -------------------------------------------------------------------------- */
   /*                     FUNCIÓN 8 - Crear Nueva tarea [POST]                    */
@@ -194,7 +255,7 @@ window.addEventListener('load', function () {
     fetch(endpoint, config)
     .then(response => response.json())
     .then(datos => {
-      renderizarTareas(datos);
+      consultarTareas();
     }).catch(error => error)
   }
 
