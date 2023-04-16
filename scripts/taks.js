@@ -15,6 +15,10 @@ window.addEventListener('load', function () {
   const btnCerrarSesion = document.querySelector('#closeApp');
   const formCrearTarea = this.document.querySelector('.nueva-tarea');
   const inputNuevaTarea = document.querySelector('#nuevaTarea');
+  const tareasPendientes = document.querySelector('.tareas-pendientes');
+  const tareasTerminadas = document.querySelector('.tareas-terminadas');
+  const cantidadTareasFinalizadas = document.querySelector('#cantidad-finalizadas');
+
   obtenerNombreUsuario();
   consultarTareas();
 
@@ -73,6 +77,8 @@ window.addEventListener('load', function () {
       .then(response => response.json())
       .then(datos => {
         console.log(datos);
+        renderizarTareas(datos);
+        
       })
       .catch(error => error);
   }
@@ -89,8 +95,6 @@ window.addEventListener('load', function () {
     crearNuevaTarea();
     inputNuevaTarea.value = "";
 
-
-
   });
 
 
@@ -98,14 +102,49 @@ window.addEventListener('load', function () {
   /*                  FUNCIÓN 5 - Renderizar tareas en pantalla                 */
   /* -------------------------------------------------------------------------- */
   function renderizarTareas(listado) {
+    
+      let tareasCompletadas = 0;
+      tareasTerminadas.innerHTML = '';
+      tareasPendientes.innerHTML = '';
+  
+      
+      listado.forEach(tarea => {
 
-
-
-
-
-
-
+        let fecha = new Date(tarea.createdAt);
+        if (tarea.completed){
+          tareasCompletadas++;
+          
+          tareasTerminadas.innerHTML +=`
+            <li class="tarea">
+              <div class="hecha">
+                <i class="fa-regular fa-circle-check"></i>
+              </div>
+              <div class="descripcion">
+                <p class="nombre">${tarea.description}</p>
+                <div class="cambios-estados">
+                  <button class="change incompleta" id="${tarea.id}" ><i class="fa-solid fa-rotate-left"></i></button>
+                  <button class="borrar" id="${tarea.id}"><i class="fa-regular fa-trash-can"></i></button>
+                </div>
+              </div>
+            </li>
+                          `;
+        } else{
+          tareasPendientes.innerHTML +=  `
+                                <li class="tarea">
+                                  <button class="change" id="${tarea.id}"><i class="fa-regular fa-circle"></i></button>
+                                  <div class="descripcion">
+                                    <p class="nombre">${tarea.description}</p>
+                                    <p class="timestamp">${fecha.toLocaleDateString()}</p>
+                                  </div>
+                                </li>
+                                        ` ;
+        }
+        cantidadTareasFinalizadas.innerText = tareasCompletadas;
+      });
+  
   };
+
+
 
   /* -------------------------------------------------------------------------- */
   /*                  FUNCIÓN 6 - Cambiar estado de tarea [PUT]                 */
@@ -155,7 +194,7 @@ window.addEventListener('load', function () {
     fetch(endpoint, config)
     .then(response => response.json())
     .then(datos => {
-      console.log(datos);
+      renderizarTareas(datos);
     }).catch(error => error)
   }
 
