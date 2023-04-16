@@ -10,10 +10,13 @@ if (jwt){
 
 /* ------ comienzan las funcionalidades una vez que carga el documento ------ */
 window.addEventListener('load', function () {
-  obtenerNombreUsuario();
+
   /* ---------------- variables globales y llamado a funciones ---------------- */
   const btnCerrarSesion = document.querySelector('#closeApp');
-
+  const formCrearTarea = this.document.querySelector('.nueva-tarea');
+  const inputNuevaTarea = document.querySelector('#nuevaTarea');
+  obtenerNombreUsuario();
+  consultarTareas();
 
   /* -------------------------------------------------------------------------- */
   /*                          FUNCIÓN 1 - Cerrar sesión                         */
@@ -58,11 +61,23 @@ window.addEventListener('load', function () {
 
   function consultarTareas() {
     
-    
+    const endpoint = 'https://todo-api.ctd.academy/v1/tasks';
+    const config = {
+      method: 'GET',
+      headers: {
+        authorization: jwt,
+      }
+      }    
 
+      fetch(endpoint, config)
+      .then(response => response.json())
+      .then(datos => {
+        console.log(datos);
+      })
+      .catch(error => error);
+  }
 
-
-  };
+  
 
 
   /* -------------------------------------------------------------------------- */
@@ -70,8 +85,9 @@ window.addEventListener('load', function () {
   /* -------------------------------------------------------------------------- */
 
   formCrearTarea.addEventListener('submit', function (event) {
-    
-
+    event.preventDefault();  
+    crearNuevaTarea();
+    inputNuevaTarea.value = "";
 
 
 
@@ -113,5 +129,34 @@ window.addEventListener('load', function () {
     
 
   };
+
+    /* -------------------------------------------------------------------------- */
+  /*                     FUNCIÓN 8 - Crear Nueva tarea [POST]                    */
+  /* -------------------------------------------------------------------------- */
+  function crearNuevaTarea () {
+    
+
+    const endpoint = 'https://todo-api.ctd.academy/v1/tasks';
+
+    const datos = {
+      description: inputNuevaTarea.value,
+      completed: false,
+    }
+
+    const config = {
+      method: 'POST',
+      headers: {
+        authorization: jwt,
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+      body: JSON.stringify(datos),
+    }
+
+    fetch(endpoint, config)
+    .then(response => response.json())
+    .then(datos => {
+      console.log(datos);
+    }).catch(error => error)
+  }
 
 });
